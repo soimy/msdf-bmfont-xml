@@ -4,7 +4,7 @@ const opentype = require('opentype.js');
 const exec = require('child_process').exec;
 const mapLimit = require('map-limit');
 const MaxRectsPacker = require('maxrects-packer').MaxRectsPacker;
-const Canvas = require('canvas-prebuilt');
+const Canvas = require('canvas');
 const path = require('path');
 const ProgressBar = require('cli-progress');
 const fs = require('fs');
@@ -173,7 +173,7 @@ function generateBMFont (fontPath, opt, callback) {
     const textures = packer.bins.map((bin, index) => {
       let svg = "";
       let texname = "";
-      const canvas = new Canvas(bin.width, bin.height);
+      const canvas = Canvas.createCanvas(bin.width, bin.height);
       const context = canvas.getContext('2d');
       if(fieldType === "msdf") {
         context.fillStyle = '#000000';
