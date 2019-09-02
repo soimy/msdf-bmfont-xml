@@ -130,6 +130,7 @@ function generateBMFont (fontPath, opt, callback) {
   }); // Remove duplicate & control chars
 
   const os2 = font.tables.os2;
+  const hhea = font.tables.hhea;
   const baseline = os2.sTypoAscender * (fontSize / font.unitsPerEm) + (distanceRange >> 1);
   const fontface = path.basename(fontPath, path.extname(fontPath));
   if(!filename) {
@@ -257,7 +258,7 @@ function generateBMFont (fontPath, opt, callback) {
         spacing: fontSpacing
       },
       common: {
-        lineHeight: (os2.sTypoAscender - os2.sTypoDescender + os2.sTypoLineGap) * (fontSize / font.unitsPerEm),
+        lineHeight: (hhea.ascender - hhea.descender + hhea.lineGap) * (fontSize / font.unitsPerEm),
         base: baseline,
         scaleW: packer.bins[0].width,
         scaleH: packer.bins[0].height,
