@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "debug": "cd test/assets/fonts && node --inspect-brk=9229 ../../../cli.js -f json -o font -u -m 512,256 -t msdf -s 42 -r 5 -p 2 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
-    "test": "cd test/assets/fonts && node ../../../cli.js -f xml -v -u -o font -m 512,256 -t msdf -s 42 -r 4 -p 2 -b 10 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
+    "test": "npm run test:disk && npm run test:memory",
+    "test:disk": "cd test/assets/fonts && node ../../../cli.js -f xml -v -u -o font -m 512,256 -t msdf -s 42 -r 4 -p 2 -b 10 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
+    "test:memory": "node test/test_memory.js",
     "render": "npm test && node test/test.js",
     "version": "standard-version"
   },

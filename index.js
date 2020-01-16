@@ -10,6 +10,7 @@ const fs = require('fs');
 const buffer = require('buffer').Buffer;
 const Jimp = require('jimp');
 const readline = require('readline');
+const assert = require('assert');
 
 const defaultCharset = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~".split('');
 const controlChars = ['\n', '\r', '\t'];
@@ -25,7 +26,7 @@ module.exports = generateBMFont;
 /**
  * Creates a BMFont compatible bitmap font of signed distance fields from a font file
  *
- * @param {string} fontPath - Path to the input ttf/otf/woff font 
+ * @param {string|Buffer} fontPath - Path or Buffer for the input ttf/otf/woff font
  * @param {Object} opt - Options object for generating bitmap font (Optional) :
  *            outputType : font file format Avaliable: xml(default), json
  *            filename : filename of both font file and font textures
@@ -41,37 +42,29 @@ module.exports = generateBMFont;
  *            square : atlas size shall be square (Default: false)
  *            rot : allow 90-degree rotation while packing (Default: false)
  *            rtl : use RTL charators fix (Default: false)
- * @param {function(string, Array.<Object>, Object)} callback - Callback funtion(err, textures, font) 
+ * @param {function(string, Array.<Object>, Object)} callback - Callback funtion(err, textures, font)
  *
  */
 function generateBMFont (fontPath, opt, callback) {
-  const binName = binaryLookup[process.platform];
-  if (binName === undefined) {
-    throw new Error(`No msdfgen binary for platform ${process.platform}.`);
-  }
-  const binaryPath = path.join(__dirname, 'bin', process.platform, binName);
-
-  if (!fontPath || typeof fontPath !== 'string') {
-    throw new TypeError('must specify a font path');
-  }
-  let fontDir = path.dirname(fontPath); // Set fallback output path to font path
   if (typeof opt === 'function') {
     callback = opt;
     opt = {};
   }
-  if (callback && typeof callback !== 'function') {
-    throw new TypeError('expected callback to be a function');
-  }
-  if (!callback) {
-    throw new TypeError('missing callback');
-  }
-  if (opt.textureSize && opt.textureSize.length !== 2) {
-    console.error('textureSize format shall be: width,height');
-    process.exit(1);
-  }
 
-  callback = callback || function () {};
-  opt = opt || {};
+  const binName = binaryLookup[process.platform];
+
+  assert.ok(binName, `No msdfgen binary for platform ${process.platform}.`);
+  assert.ok(fontPath, 'must specify a font path');
+  assert.ok(typeof fontPath === 'string' || fontPath instanceof Buffer, 'font must be string path or Buffer');
+  assert.ok(opt.filename || !(fontPath instanceof Buffer), 'must specify filename if font is a Buffer');
+  assert.ok(callback, 'missing callback')
+  assert.ok(typeof callback === 'function', 'expected callback to be a function');
+  assert.ok(!opt.textureSize || opt.textureSize.length === 2, 'textureSize format shall be: width,height');
+
+  // Set fallback output path to font path
+  let fontDir = typeof fontPath === 'string' ? path.dirname(fontPath) : '';
+  const binaryPath = path.join(__dirname, 'bin', process.platform, binName);
+
   // const reuse = (typeof opt.reuse === 'boolean' || typeof opt.reuse === 'undefined') ? {} : opt.reuse.opt;
   let reuse, cfg = {};
   if (typeof opt.reuse !== 'undefined' && typeof opt.reuse !== 'boolean') {
@@ -111,7 +104,10 @@ function generateBMFont (fontPath, opt, callback) {
     throw new TypeError('fieldType must be one of msdf, sdf, or psdf');
   }
 
-  const font = opentype.loadSync(fontPath);
+  const font = typeof fontPath === 'string'
+    ? opentype.loadSync(fontPath)
+    : opentype.parse(utils.bufferToArrayBuffer(fontPath));
+
   if (font.outlinesFormat !== 'truetype' && font.outlinesFormat !== 'cff') {
     throw new TypeError('must specify a truetype font (ttf, otf, woff)');
   }
@@ -124,14 +120,15 @@ function generateBMFont (fontPath, opt, callback) {
     border: border
   });
   const chars = [];
-  
+
   charset = charset.filter((e, i, self) => {
     return (i == self.indexOf(e)) && (!controlChars.includes(e));
   }); // Remove duplicate & control chars
 
   const os2 = font.tables.os2;
   const baseline = os2.sTypoAscender * (fontSize / font.unitsPerEm) + (distanceRange >> 1);
-  const fontface = path.basename(fontPath, path.extname(fontPath));
+
+  const fontface = filename || path.basename(fontPath, path.extname(fontPath));
   if(!filename) {
     filename = fontface;
     console.log(`Use font-face as filename : ${filename}`);

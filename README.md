@@ -127,9 +127,9 @@ generateBMFont('Some-Font.ttf', opt, (error, textures, font) => {
 
 ### API
 
-#### `generateBMFont(fontPath, [opt], callback)`
+#### `generateBMFont(fontPath | fontBuffer, [opt], callback)`
 
-Renders a bitmap font from the font at `fontPath` with optional `opt` settings, triggering `callback` on complete.
+Renders a bitmap font from the font specified by `fontPath` or `fontBuffer`, with optional `opt` settings, triggering `callback` on complete.
 
 Options:
 
@@ -138,7 +138,7 @@ Options:
     - `xml` a BMFont standard .fnt file which is wildly supported.
     - `json` a JSON file compatible with [Hiero](https://github.com/libgdx/libgdx/wiki/Hiero)
 - `filename` (String)
-  - filename of both font file and font atlas. If omited, font face name is used.
+  - filename of both font file and font atlas. If omited, font face name is used. **Required** if font is provided as a Buffer.
 - `charset` (String|Array)
   - the characters to include in the bitmap font. Defaults to all ASCII printable characters.
 - `fontSize` (Number)
