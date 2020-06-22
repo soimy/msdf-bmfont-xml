@@ -333,9 +333,9 @@ function generateImage (opt, callback) {
     xOffset = utils.roundNumber(xOffset, roundDecimal);
     yOffset = utils.roundNumber(yOffset, roundDecimal);
   }
-  let command = `${binaryPath} ${fieldType} -format text -stdout -size ${width} ${height} -translate ${xOffset} ${yOffset} -pxrange ${distanceRange} -defineshape "${shapeDesc}"`;
+  let command = `${binaryPath} ${fieldType} -format text -stdout -size ${width} ${height} -translate ${xOffset} ${yOffset} -pxrange ${distanceRange} -stdin`;
 
-  exec(command, (err, stdout, stderr) => {
+  let subproc = exec(command, (err, stdout, stderr) => {
     if (err) return callback(err);
     const rawImageData = stdout.match(/([0-9a-fA-F]+)/g).map(str => parseInt(str, 16)); // split on every number, parse from hex
     const pixels = [];
@@ -386,5 +386,9 @@ function generateImage (opt, callback) {
     };
     callback(null, container);
   });
+  
+  subproc.stdin.write(shapeDesc);
+  subproc.stdin.write('\n');
+  subproc.stdin.destroy();
 }
 
