@@ -333,7 +333,7 @@ function generateImage (opt, callback) {
     xOffset = utils.roundNumber(xOffset, roundDecimal);
     yOffset = utils.roundNumber(yOffset, roundDecimal);
   }
-  let command = `${binaryPath} ${fieldType} -format text -stdout -size ${width} ${height} -translate ${xOffset} ${yOffset} -pxrange ${distanceRange} -stdin`;
+  let command = `"${binaryPath}" ${fieldType} -format text -stdout -size ${width} ${height} -translate ${xOffset} ${yOffset} -pxrange ${distanceRange} -stdin`;
 
   let subproc = exec(command, (err, stdout, stderr) => {
     if (err) return callback(err);
