@@ -67,7 +67,7 @@
     "run-parallel": "^1.1.9",
     "serve-handler": "^6.0.2",
     "standard-version": "^6.0.1",
-    "three": "^0.102.1",
+    "three": "^0.137.0",
     "three-bmfont-text": "^2.3.0",
     "tslint": "^5.14.0",
     "typescript": "^3.3.3333",
