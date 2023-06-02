@@ -48,28 +48,28 @@
   "license": "MIT",
   "dependencies": {
     "arabic-persian-reshaper": "^1.0.1",
-    "cli-progress": "^3.10.0",
-    "commander": "^2.19.0",
-    "handlebars": "^4.7.2",
+    "cli-progress": "^3.12.0",
+    "commander": "^2.20.3",
+    "handlebars": "^4.7.7",
     "is-invalid-path": "^1.0.2",
-    "jimp": "^0.3.5",
-    "js2xmlparser": "^4.0.0",
+    "jimp": "^0.3.11",
+    "js2xmlparser": "^4.0.2",
     "map-limit": "0.0.1",
-    "maxrects-packer": "^2.4.0-alpha.0",
+    "maxrects-packer": "^2.7.3",
     "opentype.js": "^0.11.0",
     "update-notifier": "^5.1.0"
   },
   "devDependencies": {
     "cz-conventional-changelog": "^2.1.0",
-    "load-bmfont": "^1.4.0",
-    "open": "^6.3.0",
-    "rimraf": "^2.6.3",
-    "run-parallel": "^1.1.9",
-    "serve-handler": "^6.0.2",
-    "standard-version": "^9.3.2",
-    "tslint": "^5.14.0",
-    "typescript": "^3.3.3333",
-    "xml2js": "^0.4.19"
+    "load-bmfont": "^1.4.1",
+    "open": "^6.4.0",
+    "rimraf": "^2.7.1",
+    "run-parallel": "^1.2.0",
+    "serve-handler": "^6.1.5",
+    "standard-version": "^9.5.0",
+    "tslint": "^5.20.1",
+    "typescript": "^3.9.10",
+    "xml2js": "^0.4.23"
   },
   "config": {
     "commitizen": {
