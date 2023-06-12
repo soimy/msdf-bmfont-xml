@@ -17,6 +17,7 @@ const controlChars = ['\n', '\r', '\t'];
 
 const binaryLookup = {
   darwin: 'msdfgen.osx',
+  darwin_arm64: 'msdfgen.osx',
   win32: 'msdfgen.exe',
   linux: 'msdfgen.linux',
   linux_arm64: 'msdfgen.linux'
@@ -52,9 +53,11 @@ function generateBMFont (fontPath, opt, callback) {
     opt = {};
   }
 
-  const binName = process.arch === "arm64" ? binaryLookup[`${process.platform}_${process.arch}`] : binaryLookup[process.platform];
+  const lookupKey = process.arch === "arm64" ?`${process.platform}_${process.arch}` : process.platform;
 
-  assert.ok(binName, `No msdfgen binary for platform ${process.platform}.`);
+  const binName = binaryLookup[lookupKey];
+
+  assert.ok(binName, `No msdfgen binary for platform ${lookupKey}.`);
   assert.ok(fontPath, 'must specify a font path');
   assert.ok(typeof fontPath === 'string' || fontPath instanceof Buffer, 'font must be string path or Buffer');
   assert.ok(opt.filename || !(fontPath instanceof Buffer), 'must specify filename if font is a Buffer');
