@@ -131,7 +131,7 @@ function generateBMFont (fontPath, opt, callback) {
   }); // Remove duplicate & control chars
 
   const os2 = font.tables.os2;
-  const baseline = os2.sTypoAscender * (fontSize / font.unitsPerEm) + (distanceRange >> 1);
+  const baseline = os2.sTypoAscender * (fontSize / font.unitsPerEm);
 
   const fontface = typeof fontPath === 'string' ? path.basename(fontPath, path.extname(fontPath)) : filename;
 
@@ -381,7 +381,7 @@ function generateImage (opt, callback) {
           width: width,
           height: height,
           xoffset: Math.round(bBox.x1) - pad,
-          yoffset: Math.round(bBox.y1) + pad + baseline,
+          yoffset: Math.round(bBox.y1) - pad + baseline,
           xadvance: glyph.advanceWidth * scale,
           chnl: 15
         }
