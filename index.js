@@ -23,7 +23,14 @@ const binaryLookup = {
   linux_arm64: 'msdfgen.linux'
 };
 
+const defaultLogger = {
+  log: msg => console.log(`\x1b[1m[Info]\x1b[0m ${msg}\x1b[0m`),
+  warn: msg => console.warn(`\x1b[1;33m[Warn]\x1b[0m\x1b[33m ${msg}\x1b[0m`),
+  error: msg => console.error(`\x1b[1;33m[Error]\x1b[0m\x1b[31m ${msg}\x1b[0m`)
+};
+
 module.exports = generateBMFont;
+module.exports.defaultLogger = defaultLogger;
 
 /**
  * Creates a BMFont compatible bitmap font of signed distance fields from a font file
@@ -50,18 +57,14 @@ module.exports = generateBMFont;
  *
  */
 function generateBMFont (fontPath, opt, callback, customLog) {
-  let logger = customLog??console;
+  let logger = customLog||console;
   if (typeof opt === 'function') {
-    logger = callback??logger;
+    logger = callback||logger;
     callback = opt;
     opt = {};
   }
   if (logger === console) {
-    logger = {
-      log: msg => console.log('\n\x1b[0m' + msg),
-      warn: msg => console.warn('\n\x1b[33m' + msg + '\x1b[0m'),
-      error: msg => console.error('\n\x1b[31m' + msg + '\x1b[0m')
-    };
+    logger = defaultLogger;
   }
 
 
@@ -376,7 +379,7 @@ function generateImage (opt, callback, logger) {
     if (isNaN(channelCount) || !rawImageData.some(x => x !== 0)) { // if character is blank
       readline.clearLine(process.stdout);
       readline.cursorTo(process.stdout, 0);
-      logger.warn(`Warning: no bitmap for character '${char}' (${char.charCodeAt(0)}), adding to font as empty`);
+      logger.warn(`No bitmap for character '${char}' (${char.charCodeAt(0)}), adding to font as empty`);
       width = 0;
       height = 0;
     } else {
