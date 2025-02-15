@@ -68,11 +68,11 @@ function generateBMFont (fontPath, opt, callback, customLog) {
   }
 
 
-  const lookupKey = process.arch === "arm64" ?`${process.platform}_${process.arch}` : process.platform;
+  const platformKey = process.arch === "arm64" ?`${process.platform}_${process.arch}` : process.platform;
 
-  const binName = binaryLookup[lookupKey];
+  const binName = binaryLookup[platformKey];
 
-  assert.ok(binName, `No msdfgen binary for platform ${lookupKey}.`);
+  assert.ok(binName, `No msdfgen binary for platform ${platformKey}.`);
   assert.ok(fontPath, 'must specify a font path');
   assert.ok(typeof fontPath === 'string' || fontPath instanceof Buffer, 'font must be string path or Buffer');
   assert.ok(opt.filename || !(fontPath instanceof Buffer), 'must specify filename if font is a Buffer');
@@ -82,7 +82,7 @@ function generateBMFont (fontPath, opt, callback, customLog) {
 
   // Set fallback output path to font path
   let fontDir = typeof fontPath === 'string' ? path.dirname(fontPath) : '';
-  const binaryPath = path.join(__dirname, 'bin', process.platform, binName);
+  const binaryPath = path.join(__dirname, 'bin', platformKey, binName);
 
   // const reuse = (typeof opt.reuse === 'boolean' || typeof opt.reuse === 'undefined') ? {} : opt.reuse.opt;
   let reuse, cfg = {};
