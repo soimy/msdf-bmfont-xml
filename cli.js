@@ -8,7 +8,7 @@ const handlebars = require('handlebars');
 const args = require('commander');
 const updateNotifier = require('update-notifier');
 const utils = require('./lib/utils');
-
+const logger = generateBMFont.defaultLogger;
 updateNotifier({pkg}).notify();
 
 let fontFile;
@@ -39,12 +39,12 @@ args
   }).parse(process.argv);
 
 //
-// Initialize options 
+// Initialize options
 //
 let opt = args.opts();
 utils.roundAllValue(opt); // Parse all number from string
 if (!fontFile) {
-  console.error('Must specify font-file, use: \'msdf-bmfont -h\' for more infomation');
+  logger.error('Must specify font-file, use: \'msdf-bmfont -h\' for more infomation');
   process.exit(1);
 }
 const fontface = path.basename(fontFile, path.extname(fontFile));
@@ -71,41 +71,41 @@ if (typeof opt.reuse === 'boolean') {
 }
 
 //
-// Display options 
+// Display options
 //
 const keys = Object.keys(opt)
 const padding = longestLength(keys) + 2;
-console.log("\nUsing following settings");
-console.log("========================================");
+logger.log("Using following settings");
+logger.log("========================================");
 keys.forEach(key => {
   if (typeof opt.reuse === 'string' && typeof opt[key] === 'undefined') {
-    console.log(pad(key, padding) + ": Defined in [" + opt.reuse + "]");
+    logger.log(`${pad(key, padding)}: Defined in [${opt.reuse}]`);
   } else if (key === 'charsetFile' && typeof opt[key] === 'undefined') {
-    console.log(pad(key, padding) + ": Unspecified, fallback to ASC-II");
-  } else console.log(pad(key, padding) + ": " + opt[key]);
+    logger.log(`${pad(key, padding)}: Unspecified, fallback to ASC-II`);
+  } else logger.log(`${pad(key, padding)}: ${opt[key]}`);
 });
-console.log("========================================");
+logger.log("========================================");
 
 //
 // Validate
 //
 if (typeof opt.fontFile === 'undefined') {
-  console.error('No font file specified, aborting.... use -h for help');
+  logger.error('No font file specified, aborting.... use -h for help');
   process.exit(1);
 }
 if (typeof opt.reuse !== 'boolean') opt.reuse = fileValidate(opt.reuse);
 
 fs.readFile(opt.charsetFile || '', 'utf8', (error, data) => {
   if (error) {
-    console.warn('No valid charset file loaded, fallback to ASC-II');
+    logger.warn('No valid charset file loaded, fallback to ASC-II');
   }
   if (data) opt.charset = data;
-  
+
   generateBMFont(opt.fontFile, opt, (error, textures, font) => {
     if (error) throw error;
     textures.forEach((texture, index) => {
       if (opt.vector) {
-        const svgTemplate = 
+        const svgTemplate =
         `<?xml version="1.0"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{{width}}" height="{{height}}">
@@ -119,23 +119,23 @@ fs.readFile(opt.charsetFile || '', 'utf8', (error, data) => {
         });
         fs.writeFile(`${texture.filename}.svg`, content , (err) => {
           if (err) throw err;
-          console.log('wrote svg[', index, ']         : ', `${texture.filename}.svg`);
+          logger.log(`wrote svg[${index}]\t\t: ${texture.filename}.svg`);
         });
-      } 
+      }
       fs.writeFile(`${texture.filename}.png`, texture.texture, (err) => {
         if (err) throw err;
-        console.log('wrote spritesheet[', index, '] : ', `${texture.filename}.png`);
+        logger.log(`wrote spritesheet[${index}]\t: ${texture.filename}.png`);
       });
     });
     fs.writeFile(font.filename, font.data, (err) => {
       if (err) throw err;
-      console.log('wrote font file        : ', font.filename);
+      logger.log(`wrote font file\t\t: ${font.filename}`);
     });
     if(opt.reuse !== false) {
       let cfgFileName = typeof opt.reuse === 'boolean' ? `${textures[0].filename}.cfg` : opt.reuse;
       fs.writeFile(cfgFileName, JSON.stringify(font.settings, null, '\t'), (err) => {
         if (err) throw err;
-        console.log('wrote cfg file         : ', cfgFileName);
+        logger.log(`wrote cfg file\t\t: ${cfgFileName}`);
       });
     }
   });
@@ -172,18 +172,18 @@ function fileExistValidate(filePath) {
   try {
     if(fs.statSync(filePath).isFile()) return path.normalize(filePath);
     else {
-      console.error('File: ', filePath, ' not found! Aborting...');
+      logger.error(`File: ${filePath} not found! Aborting...`);
       process.exit(1);
     }
   } catch(err) {
-      console.error('File: ', filePath, ' not valid! Aborting...');
+      logger.error(`File: ${filePath} not valid! Aborting...`);
       process.exit(1);
   }
 }
 
 function fileValidate(filePath) {
   if (require('is-invalid-path')(filePath)) {
-    console.error('File: ', filePath, ' not valid! Aborting...');
+    logger.error(`File: ${filePath} not valid! Aborting...`);
     process.exit(1);
   } else return path.normalize(filePath);
 }
