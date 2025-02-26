@@ -65,7 +65,7 @@
     "open": "^6.4.0",
     "rimraf": "^2.7.1",
     "run-parallel": "^1.2.0",
-    "serve-handler": "^6.1.5",
+    "serve-handler": "^6.1.6",
     "standard-version": "^9.5.0",
     "tslint": "^5.20.1",
     "typescript": "^3.9.10",
