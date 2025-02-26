@@ -52,7 +52,7 @@
     "commander": "^2.20.3",
     "handlebars": "^4.7.7",
     "is-invalid-path": "^1.0.2",
-    "jimp": "^0.3.11",
+    "jimp": "^1.6.0",
     "js2xmlparser": "^4.0.2",
     "map-limit": "0.0.1",
     "maxrects-packer": "^2.7.3",
