@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "debug": "cd test/assets/fonts && node --inspect-brk=9229 ../../../cli.js -f json -o font -u -m 512,256 -t msdf -s 42 -r 5 -p 2 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
-    "test": "npm run test:disk && npm run test:memory",
+    "test": "npm run test:disk && npm run test:memory && node test/test.js",
     "test:disk": "cd test/assets/fonts && node ../../../cli.js -f xml -o DIN_CB -v -u -m 512,256 -t msdf -s 42 -r 4 -p 2 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
     "test:memory": "node test/test_memory.js",
     "test:rtl": "cd test/assets/fonts && node ../../../cli.js -f xml -o Iransans -i ../../../assets/charset/charset.persian.txt -v -u -m 512,256 -t msdf -s 42 -r 4 -p 2 --smart-size --pot ../../../assets/fonts/Iransans.ttf",
@@ -50,7 +50,7 @@
     "arabic-persian-reshaper": "^1.0.1",
     "cli-progress": "^3.12.0",
     "commander": "^2.20.3",
-    "handlebars": "^4.7.7",
+    "handlebars": "^4.7.8",
     "is-invalid-path": "^1.0.2",
     "jimp": "^1.6.0",
     "js2xmlparser": "^4.0.2",
@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "cz-conventional-changelog": "^2.1.0",
-    "load-bmfont": "^1.4.1",
+    "load-bmfont": "^1.4.2",
     "open": "^6.4.0",
     "rimraf": "^2.7.1",
     "run-parallel": "^1.2.0",
