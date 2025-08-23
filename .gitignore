@@ -10,3 +10,4 @@ test/assets/fonts/*.cfg
 .vscode/
 .eslintrc*
 .prettierrc
+bin/
