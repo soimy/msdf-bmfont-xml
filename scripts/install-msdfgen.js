@@ -7,6 +7,14 @@ const { execSync } = require('child_process');
 const os = require('os');
 const crypto = require('crypto');
 
+// Command line options
+const args = process.argv.slice(2);
+const options = {
+  downloadAll: args.includes('--download-all') || args.includes('-a'),
+  force: args.includes('--force') || args.includes('-f'),
+  help: args.includes('--help') || args.includes('-h')
+};
+
 // GitHub repository information
 const REPO_OWNER = 'soimy';
 const REPO_NAME = 'msdfgen';
@@ -35,6 +43,26 @@ const binaryNames = {
   'linux_arm64': 'msdfgen.linux',
   'win32': 'msdfgen.exe'
 };
+
+/**
+ * Show help information
+ */
+function showHelp() {
+  console.log(`
+Usage: node install-msdfgen.js [options]
+
+Options:
+  -h, --help         Show this help message
+  -a, --download-all Download binaries for all supported platforms
+  -f, --force        Force download without hash verification
+
+Examples:
+  node install-msdfgen.js                    # Install binary for current platform (with hash check)
+  node install-msdfgen.js --download-all     # Download all platform binaries (with hash check)
+  node install-msdfgen.js --force            # Force download current platform binary
+  node install-msdfgen.js -a -f              # Force download all platform binaries
+`);
+}
 
 /**
  * Calculate SHA256 hash of a file
@@ -104,7 +132,13 @@ function storeReleaseInfo(binaryPath, releaseData, assetData) {
 /**
  * Check if we need to update based on release info and file hash
  */
-function needsUpdate(binaryPath, latestRelease, targetAsset) {
+function needsUpdate(binaryPath, latestRelease, targetAsset, force = false) {
+  // If force download is requested, always download
+  if (force) {
+    console.log('💪 Force download requested');
+    return true;
+  }
+  
   // If binary doesn't exist, we need to download
   if (!fs.existsSync(binaryPath)) {
     console.log('📥 Binary not found, will download');
@@ -431,7 +465,7 @@ async function extractBinary(downloadPath, platformKey, targetPath) {
 /**
  * Main installation function
  */
-async function installMsdfgen() {
+async function installMsdfgen(force = false) {
   // Check if installation should be skipped
   if (process.env.SKIP_MSDFGEN_INSTALL) {
     console.log('⏭️  Skipping msdfgen installation (SKIP_MSDFGEN_INSTALL is set)');
@@ -445,60 +479,7 @@ async function installMsdfgen() {
     const platformKey = getCurrentPlatform();
     console.log(`🖥️  Detected platform: ${platformKey}`);
     
-    // Setup paths
-    const platformDir = path.join(BIN_DIR, platformKey);
-    const binaryName = binaryNames[platformKey];
-    const targetPath = path.join(platformDir, binaryName);
-    
-    // Get latest release information
-    const release = await getLatestRelease();
-    
-    // Find appropriate asset
-    const asset = findAssetForPlatform(release.assets, platformKey);
-    if (!asset) {
-      throw new Error(`No suitable binary found for platform: ${platformKey}`);
-    }
-    
-    console.log(`🎯 Target asset: ${asset.name} (ID: ${asset.id})`);
-    
-    // Check if we need to update using release ID and file hash comparison
-    if (!needsUpdate(targetPath, release, asset)) {
-      return; // Already up to date
-    }
-    
-    // Prepare download
-    const downloadPath = path.join(platformDir, asset.name);
-    
-    // Download the asset
-    await downloadFile(asset.browser_download_url, downloadPath);
-    
-    // Extract if needed and move to final location
-    if (downloadPath !== targetPath) {
-      await extractBinary(downloadPath, platformKey, targetPath);
-    }
-    
-    // Verify the binary exists and is executable
-    if (!fs.existsSync(targetPath)) {
-      throw new Error(`Binary not found at expected location: ${targetPath}`);
-    }
-    
-    // Make executable on Unix-like systems
-    if (process.platform !== 'win32') {
-      fs.chmodSync(targetPath, 0o755);
-    }
-    
-    console.log(`✅ Successfully installed msdfgen binary: ${targetPath}`);
-    
-    // Handle macOS security issues
-    if (process.platform === 'darwin') {
-      removeMacOSQuarantine(targetPath);
-    }
-    
-    // Store release metadata for future comparisons
-    storeReleaseInfo(targetPath, release, asset);
-    
-    // Test the binary with platform-specific guidance
-    testBinaryAndProvideMacOSGuidance(targetPath);
+    return await installMsdfgenForPlatform(platformKey, force);
     
   } catch (error) {
     console.error('❌ Installation failed:', error.message);
@@ -509,9 +490,150 @@ async function installMsdfgen() {
   }
 }
 
-// Run if called directly
-if (require.main === module) {
-  installMsdfgen();
+/**
+ * Install msdfgen binary for a specific platform
+ */
+async function installMsdfgenForPlatform(platformKey, force = false) {
+  console.log(`📦 Installing for platform: ${platformKey}`);
+  
+  // Setup paths
+  const platformDir = path.join(BIN_DIR, platformKey);
+  const binaryName = binaryNames[platformKey];
+  const targetPath = path.join(platformDir, binaryName);
+  
+  // Get latest release information
+  const release = await getLatestRelease();
+  
+  // Find appropriate asset
+  const asset = findAssetForPlatform(release.assets, platformKey);
+  if (!asset) {
+    throw new Error(`No suitable binary found for platform: ${platformKey}`);
+  }
+  
+  console.log(`🎯 Target asset: ${asset.name} (ID: ${asset.id})`);
+  
+  // Check if we need to update using release ID and file hash comparison
+  if (!needsUpdate(targetPath, release, asset, force)) {
+    console.log(`✅ ${platformKey} binary is already up-to-date`);
+    return targetPath; // Already up to date
+  }
+  
+  // Prepare download
+  const downloadPath = path.join(platformDir, asset.name);
+  
+  // Download the asset
+  await downloadFile(asset.browser_download_url, downloadPath);
+  
+  // Extract if needed and move to final location
+  if (downloadPath !== targetPath) {
+    await extractBinary(downloadPath, platformKey, targetPath);
+  }
+  
+  // Verify the binary exists and is executable
+  if (!fs.existsSync(targetPath)) {
+    throw new Error(`Binary not found at expected location: ${targetPath}`);
+  }
+  
+  // Make executable on Unix-like systems
+  if (process.platform !== 'win32') {
+    fs.chmodSync(targetPath, 0o755);
+  }
+  
+  console.log(`✅ Successfully installed msdfgen binary: ${targetPath}`);
+  
+  // Handle macOS security issues (only for current platform)
+  if (process.platform === 'darwin' && platformKey.startsWith('darwin')) {
+    removeMacOSQuarantine(targetPath);
+  }
+  
+  // Store release metadata for future comparisons
+  storeReleaseInfo(targetPath, release, asset);
+  
+  // Test the binary with platform-specific guidance (only for current platform)
+  if (platformKey === getCurrentPlatform()) {
+    testBinaryAndProvideMacOSGuidance(targetPath);
+  }
+  
+  return targetPath;
 }
 
-module.exports = installMsdfgen;
+/**
+ * Install msdfgen binaries for all supported platforms
+ */
+async function installAllPlatforms(force = false) {
+  console.log('🌐 Installing msdfgen binaries for all platforms...');
+  
+  // Get unique platform keys to avoid duplicates
+  const allPlatforms = [...new Set(Object.values(platformMapping).flatMap(Object.values))];
+  const results = [];
+  
+  for (const platformKey of allPlatforms) {
+    try {
+      console.log(`\n📦 Processing ${platformKey}...`);
+      const binaryPath = await installMsdfgenForPlatform(platformKey, force);
+      results.push({ platform: platformKey, success: true, path: binaryPath });
+    } catch (error) {
+      console.error(`❌ Failed to install for ${platformKey}: ${error.message}`);
+      results.push({ platform: platformKey, success: false, error: error.message });
+    }
+  }
+  
+  // Summary
+  console.log('\n📊 Installation Summary:');
+  const successful = results.filter(r => r.success);
+  const failed = results.filter(r => !r.success);
+  
+  console.log(`✅ Successful: ${successful.length}`);
+  successful.forEach(r => console.log(`  - ${r.platform}: ${r.path}`));
+  
+  if (failed.length > 0) {
+    console.log(`❌ Failed: ${failed.length}`);
+    failed.forEach(r => console.log(`  - ${r.platform}: ${r.error}`));
+  }
+  
+  return results;
+}
+
+/**
+ * Main entry point when script is run directly
+ */
+async function main() {
+  // Handle help option first
+  if (options.help) {
+    showHelp();
+    return;
+  }
+  
+  try {
+    // Handle download all option
+    if (options.downloadAll) {
+      const results = await installAllPlatforms(options.force);
+      
+      const failed = results.filter(r => !r.success);
+      if (failed.length > 0) {
+        process.exit(1);
+      }
+      return;
+    }
+    
+    // Default behavior: install for current platform only
+    await installMsdfgen(options.force);
+    
+  } catch (error) {
+    console.error('❌ Script failed:', error.message);
+    process.exit(1);
+  }
+}
+
+// Run if called directly
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  installMsdfgen,
+  installMsdfgenForPlatform,
+  installAllPlatforms,
+  getCurrentPlatform,
+  calculateFileHash
+};

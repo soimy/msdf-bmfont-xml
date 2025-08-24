@@ -1,15 +1,10 @@
-# msdfgen 二进制自动下载
+# msdfgen Binary Distribution and Sync Scripts
 
-这个脚本会在 `npm install` 时自动从 GitHub 下载最新版本的 msdfgen 二进制文件。
+## Change: Pre-bundled Binaries
+All platform binaries for msdfgen are now pre-bundled in the repo (`bin/` directory). When distributed as an npm module, binaries are served via npm's CDN, avoiding GitHub rate limits and download failures.
 
-## 工作原理
-
-1. **自动检测平台**: 脚本会自动检测当前的操作系统和架构
-2. **获取最新版本**: 从 GitHub API 获取 soimy/msdfgen 仓库的最新 release
-3. **下载对应二进制**: 根据平台下载对应的二进制文件到 `bin/` 目录
-4. **设置权限**: 在 Unix 系统上自动设置可执行权限
-
-## 支持的平台
+## Installation Behavior
+During `npm install`, no automatic download is performed. The binaries are already present for all supported platforms:
 
 - **macOS**: 
   - Intel (x64) → `bin/darwin/msdfgen.osx`
@@ -20,41 +15,41 @@
 - **Windows**:
   - x64/x86 → `bin/win32/msdfgen.exe`
 
-## 手动安装
+## Development Scripts
+The scripts in `scripts/` (`install-msdfgen.js`, `check-binary.js`) are now only used for development and maintenance. They help synchronize or update msdfgen binaries from upstream, but are not required for end users or during normal installation.
 
-如果自动安装失败，你可以手动运行安装脚本：
-
+### Usage (for maintainers only)
 ```bash
+# Show help
+node scripts/install-msdfgen.js --help
+
+# Sync current platform binary
 node scripts/install-msdfgen.js
+
+# Sync all platform binaries
+node scripts/install-msdfgen.js --download-all
+
+# Force re-download
+node scripts/install-msdfgen.js --force
 ```
 
-## 跳过自动安装
+## Troubleshooting
+If you encounter issues with the binaries, you can manually resync using the scripts above. For most users, this is not necessary.
 
-如果你想跳过自动安装（比如你已经有自己的二进制文件），可以设置环境变量：
+## macOS Security Handling
+macOS security handling (quarantine removal, code signing, etc.) is still performed automatically during install if needed. See `MACOS_SECURITY.md` for details.
 
-```bash
-SKIP_MSDFGEN_INSTALL=1 npm install
-```
-
-## 故障排除
-
-1. **网络问题**: 确保你的网络可以访问 GitHub API 和下载链接
-2. **权限问题**: 确保有权限写入 `bin/` 目录
-3. **平台不支持**: 检查你的平台是否在支持列表中
-4. **代理设置**: 如果使用代理，确保 Node.js 可以通过代理访问网络
-
-## 文件结构
-
+## File Structure
 ```
 bin/
-├── darwin/           # macOS Intel
-│   └── msdfgen.osx
-├── darwin_arm64/     # macOS Apple Silicon  
-│   └── msdfgen.osx
-├── linux/            # Linux x64
-│   └── msdfgen.linux
-├── linux_arm64/      # Linux ARM64
-│   └── msdfgen.linux
-└── win32/            # Windows
-    └── msdfgen.exe
+├── darwin/                    # macOS Intel
+│   ├── msdfgen.osx
+├── darwin_arm64/             # macOS Apple Silicon  
+│   ├── msdfgen.osx
+├── linux/                    # Linux x64
+│   ├── msdfgen.linux
+├── linux_arm64/              # Linux ARM64
+│   ├── msdfgen.linux
+└── win32/                    # Windows
+    ├── msdfgen.exe
 ```
