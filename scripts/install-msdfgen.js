@@ -132,7 +132,7 @@ function storeReleaseInfo(binaryPath, releaseData, assetData) {
 /**
  * Check if we need to update based on release info and file hash
  */
-function needsUpdate(binaryPath, latestRelease, targetAsset, force = false) {
+function needsUpdate(binaryPath, latestRelease, targetAsset, platformKey, force = false) {
   // If force download is requested, always download
   if (force) {
     console.log('💪 Force download requested');
@@ -171,15 +171,21 @@ function needsUpdate(binaryPath, latestRelease, targetAsset, force = false) {
     return true;
   }
   
-  // Test if binary is actually working
-  try {
-    execSync(`"${binaryPath}" --help`, { stdio: 'pipe' });
-    console.log('✅ Binary is up-to-date and working');
-    return false;
-  } catch (error) {
-    console.log('⚠️  Binary exists but not working, will re-download');
-    return true;
+  // Test if binary is actually working (only for current platform)
+  const currentPlatform = getCurrentPlatform();
+  if (platformKey === currentPlatform) {
+    try {
+      execSync(`"${binaryPath}" --help`, { stdio: 'pipe' });
+      console.log('✅ Binary is up-to-date and working');
+    } catch (error) {
+      console.log('⚠️  Binary exists but not working, will re-download');
+      return true;
+    }
+  } else {
+    console.log('✅ Binary file is up-to-date (hash verified)');
   }
+  
+  return false;
 }
 
 /**
@@ -513,7 +519,7 @@ async function installMsdfgenForPlatform(platformKey, force = false) {
   console.log(`🎯 Target asset: ${asset.name} (ID: ${asset.id})`);
   
   // Check if we need to update using release ID and file hash comparison
-  if (!needsUpdate(targetPath, release, asset, force)) {
+  if (!needsUpdate(targetPath, release, asset, platformKey, force)) {
     console.log(`✅ ${platformKey} binary is already up-to-date`);
     return targetPath; // Already up to date
   }
