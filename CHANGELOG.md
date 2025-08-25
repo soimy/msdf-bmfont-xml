@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.8.0](https://github.com/soimy/msdf-bmfont-xml/compare/v2.7.0...v2.8.0) (2025-08-25)
+
+
+### Features
+
+* add an optional logger ([#94](https://github.com/soimy/msdf-bmfont-xml/issues/94)) ([523c5e5](https://github.com/soimy/msdf-bmfont-xml/commit/523c5e5ef50921669f90c94972a4b30369c9bec9))
+* Add arm64 linux compatibility ([#89](https://github.com/soimy/msdf-bmfont-xml/issues/89)) ([0cb2817](https://github.com/soimy/msdf-bmfont-xml/commit/0cb28172a64699f805f6e063bd25c03c5b9a0d54))
+* Add arm64 MacOS compatibility ([#90](https://github.com/soimy/msdf-bmfont-xml/issues/90)) ([5a2495a](https://github.com/soimy/msdf-bmfont-xml/commit/5a2495a14a1ebd3170d49350f450b6e3f531a941))
+
+
+### Bug Fixes
+
+* **deps:** update handlebars and load-bmfont ([2c149bd](https://github.com/soimy/msdf-bmfont-xml/commit/2c149bdd32eddc5bd74b41d36bf303e4b69df3ae))
+* remove node test.js render in npm run test ([bd28cc0](https://github.com/soimy/msdf-bmfont-xml/commit/bd28cc06dccc2e5e1e7d2f22db441f290a23f4dc))
+
 ## [2.7.0](https://github.com/soimy/msdf-bmfont-xml/compare/v2.6.0...v2.7.0) (2022-07-23)
 
 
