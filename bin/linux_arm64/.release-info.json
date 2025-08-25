@@ -1,0 +1,10 @@
+{
+  "release_id": 241896904,
+  "tag_name": "v1.12.1-dev",
+  "published_at": "2025-08-22T16:50:49Z",
+  "asset_id": 285210479,
+  "asset_name": "msdfgen-v1.12.1-dev-linux-arm64",
+  "asset_url": "https://github.com/soimy/msdfgen/releases/download/v1.12.1-dev/msdfgen-v1.12.1-dev-linux-arm64",
+  "downloaded_at": "2025-08-24T13:30:34.506Z",
+  "binary_hash": "895243d2bf7eca2d81b5c8f241e71c90d11998ed8972a7f82e1fce3f52ae0425"
+}

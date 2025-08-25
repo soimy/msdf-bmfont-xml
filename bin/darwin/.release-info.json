@@ -1,0 +1,10 @@
+{
+  "release_id": 241896904,
+  "tag_name": "v1.12.1-dev",
+  "published_at": "2025-08-22T16:50:49Z",
+  "asset_id": 286067549,
+  "asset_name": "msdfgen-v1.12.1-dev-macos-x64",
+  "asset_url": "https://github.com/soimy/msdfgen/releases/download/v1.12.1-dev/msdfgen-v1.12.1-dev-macos-x64",
+  "downloaded_at": "2025-08-25T15:33:14.775Z",
+  "binary_hash": "7407b8386c4cb3893995176b6b31594ea84e3c2fee049825fff32f5760f5378f"
+}

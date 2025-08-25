@@ -1,12 +1,22 @@
 {
   "name": "msdf-bmfont-xml",
-  "version": "2.3.5",
+  "version": "2.8.0",
   "description": "Creates a BMFont compatible bitmap font of Signed-Distance Fields from a font file",
   "main": "index.js",
   "scripts": {
-    "debug": "cd test/output && node --inspect-brk=9229 ../../cli.js -f json -o font -m 512,256 -t msdf -s 46 -r 5 -p 2 --smart-size --pot ../../assets/fonts/DIN_CB.ttf",
-    "test": "cd test/output && node ../../cli.js -f json -v -u -o font -m 512,256 -t msdf -s 42 -r 4 --smart-size --pot ../../assets/fonts/DIN_CB.ttf",
-    "render": "npm test && devtool test/test-render.js -s -- 'output/DIN_CB.fnt'"
+    "update-msdfgen": "node scripts/install-msdfgen.js",
+    "update-msdfgen-all": "node scripts/install-msdfgen.js --download-all",
+    "check-binary": "node scripts/check-binary.js status",
+    "clean-metadata": "node scripts/check-binary.js clean",
+    "debug": "cd test/assets/fonts && node --inspect-brk=9229 ../../../cli.js -f json -o font -u -m 512,256 -t msdf -s 42 -r 5 -p 2 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
+    "test": "npm run test:disk && npm run test:memory",
+    "test:disk": "cd test/assets/fonts && node ../../../cli.js -f xml -o DIN_CB -v -u -m 512,256 -t msdf -s 42 -r 4 -p 2 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
+    "test:memory": "node test/test_memory.js",
+    "test:rtl": "cd test/assets/fonts && node ../../../cli.js -f xml -o Iransans -i ../../../assets/charset/charset.persian.txt -v -u -m 512,256 -t msdf -s 42 -r 4 -p 2 --smart-size --pot ../../../assets/fonts/Iransans.ttf",
+    "test:save": "cd test/assets/fonts && node ../../../cli.js -o DIN_CB -u -m 512,256 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
+    "test:reuse": "cd test/assets/fonts && node --inspect-brk=9229 ../../../cli.js -u DIN_CB.cfg ../../../assets/fonts/FiraSansMedium.woff",
+    "render": "npm run test:disk && node test/test.js",
+    "version": "standard-version"
   },
   "bin": {
     "msdf-bmfont": "./cli.js"
@@ -41,24 +51,33 @@
   },
   "license": "MIT",
   "dependencies": {
-    "arabic-persian-reshaper": "^1.0.0",
-    "cli-progress": "^2.1.1",
-    "commander": "^2.19.0",
-    "handlebars": "^4.1.1",
+    "arabic-persian-reshaper": "^1.0.1",
+    "cli-progress": "^3.12.0",
+    "commander": "^14.0.0",
+    "handlebars": "^4.7.8",
     "is-invalid-path": "^1.0.2",
-    "jimp": "^0.6.0",
-    "js2xmlparser": "^4.0.0",
+    "jimp": "^1.6.0",
+    "js2xmlparser": "^5.0.0",
     "map-limit": "0.0.1",
-    "maxrects-packer": "^2.0.2",
-    "opentype.js": "^0.11.0"
+    "maxrects-packer": "^2.7.3",
+    "opentype.js": "^1.3.4",
+    "update-notifier": "^7.3.1"
   },
   "devDependencies": {
-    "load-bmfont": "^1.4.0",
-    "run-parallel": "^1.1.9",
-    "three": "^0.102.1",
-    "three-bmfont-text": "^2.3.0",
-    "tslint": "^5.14.0",
-    "typescript": "^3.3.3333",
-    "xml2js": "^0.4.19"
+    "cz-conventional-changelog": "^3.3.0",
+    "load-bmfont": "^1.4.2",
+    "open": "^10.2.0",
+    "rimraf": "^6.0.1",
+    "run-parallel": "^1.2.0",
+    "serve-handler": "^6.1.6",
+    "standard-version": "^9.5.0",
+    "tslint": "^5.20.1",
+    "typescript": "^5.9.2",
+    "xml2js": "^0.6.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
