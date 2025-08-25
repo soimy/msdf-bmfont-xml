@@ -25,6 +25,7 @@ npm install msdf-bmfont-xml -g
 **✨ 更新**：所有支持平台的 msdfgen 二进制文件现已预置在仓库并通过 npm 分发，避免 GitHub 流量限制和下载失败。安装时不会自动下载。
 
 支持平台：
+
 - macOS（Intel & Apple Silicon）
 - Linux（x64 & ARM64）
 - Windows（x64）

@@ -22,10 +22,10 @@ npm install & npm run render
 npm install msdf-bmfont-xml -g
 ```
 
-
 **✨ Update**: All msdfgen binaries for supported platforms are now pre-bundled in the repo and distributed via npm. This avoids GitHub rate limits and download failures. No automatic download is performed during installation.
 
 Supported platforms:
+
 - macOS (Intel & Apple Silicon)
 - Linux (x64 & ARM64)
 - Windows (x64)
