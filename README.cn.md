@@ -1,6 +1,8 @@
 # msdf-bmfont-xml
 
-[![Build Status](https://travis-ci.org/soimy/msdf-bmfont-xml.svg?branch=master)](https://travis-ci.org/soimy/msdf-bmfont-xml)
+[🇺🇸 English Doc](./README.md)
+
+[![GitHub Actions](https://github.com/soimy/msdf-bmfont-xml/actions/workflows/node.js.yml/badge.svg)](https://github.com/soimy/msdf-bmfont-xml/actions)
 [![npm version](https://badge.fury.io/js/msdf-bmfont-xml.svg)](https://badge.fury.io/js/msdf-bmfont-xml)
 ![npm](https://img.shields.io/npm/dm/msdf-bmfont-xml.svg)
 
@@ -9,6 +11,12 @@
 有符号距离场是一种通过纹理重现矢量图形的方法，详见 [Valve 的论文](http://www.valvesoftware.com/publications/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf)。本工具使用 [Chlumsky/msdfgen](https://github.com/Chlumsky/msdfgen) 生成多通道距离场以保留字体边角。距离场由矢量字体生成，并渲染到纹理页。BMFont 对象用于字符排版。（参考 [BMFont 格式](http://www.angelcode.com/products/bmfont/doc/file_format.html)）
 
 ![预览图](https://raw.githubusercontent.com/soimy/msdf-bmfont-xml/master/assets/msdf-bmfont-xml.png)
+
+## 支持平台
+
+- macOS（Intel & Apple Silicon）
+- Linux（x64 & ARM64）
+- Windows（x64）
 
 ## 使用 pixi.js 在浏览器预览 MSDF 字体
 
@@ -22,15 +30,15 @@ npm install & npm run render
 npm install msdf-bmfont-xml -g
 ```
 
-**✨ 更新**：所有支持平台的 msdfgen 二进制文件现已预置在仓库并通过 npm 分发，避免 GitHub 流量限制和下载失败。安装时不会自动下载。
-
-支持平台：
-
-- macOS（Intel & Apple Silicon）
-- Linux（x64 & ARM64）
-- Windows（x64）
-
-在 macOS 上，安装器会自动处理安全限制（移除隔离属性、代码签名等，详见 `MACOS_SECURITY.md`）。
+> ### msdfgen 多平台可执行程序
+>
+> 本工具的字符生成msdf贴图依赖于 [msdfgen](https://github.com/Chlumsky/msdfgen) 目前已经支持最新版本(1.12.1)的多平台可执行程序
+>
+> **✨ 更新**：所有支持平台的 msdfgen 二进制文件现已预置在仓库并通过 npm 分发，避免 GitHub 流量限制和下载失败。安装时不会自动下载。
+> 如需要手动下载更新，请参阅 [MSDFGEN_INSTALL.md](./docs/MSDFGEN_INSTALL.cn.md)。
+>
+> 在 macOS 上，安装器会自动处理安全限制（移除隔离属性、代码签名等) 详见 [MACOS_SECURITY.md](./docs/MACOS_SECURITY.cn.md)。
+>
 
 安装完成后，直接在控制台运行 `msdf-bmfont` 生成字体文件。
 输入 `msdf-bmfont --help` 查看详细用法。

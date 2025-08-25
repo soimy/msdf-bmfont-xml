@@ -1,6 +1,8 @@
 # msdf-bmfont-xml
 
-[![Build Status](https://travis-ci.org/soimy/msdf-bmfont-xml.svg?branch=master)](https://travis-ci.org/soimy/msdf-bmfont-xml)
+[🇨🇳 中文文档](./README.cn.md)
+
+[![GitHub Actions](https://github.com/soimy/msdf-bmfont-xml/actions/workflows/node.js.yml/badge.svg)](https://github.com/soimy/msdf-bmfont-xml/actions)
 [![npm version](https://badge.fury.io/js/msdf-bmfont-xml.svg)](https://badge.fury.io/js/msdf-bmfont-xml)
 ![npm](https://img.shields.io/npm/dm/msdf-bmfont-xml.svg)
 
@@ -9,6 +11,23 @@ Converts a `.ttf` font file into multichannel signed distance fields, then outpu
 Signed distance fields are a method of reproducing vector shapes from a texture representation, popularized in [this paper by Valve](http://www.valvesoftware.com/publications/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf).
 This tool uses [Chlumsky/msdfgen](https://github.com/Chlumsky/msdfgen) to generate multichannel signed distance fields to preserve corners. The distance fields are created from vector fonts, then rendered into texture pages. A BMFont object is provided for character layout. (See: [BMFont format](http://www.angelcode.com/products/bmfont/doc/file_format.html))
 ![Preview image](https://raw.githubusercontent.com/soimy/msdf-bmfont-xml/master/assets/msdf-bmfont-xml.png)
+
+## Supported Platforms
+
+- macOS (Intel & Apple Silicon)
+- Linux (x64 & ARM64)
+- Windows (x64)
+
+> ## msdfgen Multi-platform Executables
+>
+> This tool's character MSDF generation depends on [msdfgen](https://github.com/Chlumsky/msdfgen), now supporting the latest version (1.12.1) for all platforms.
+>
+> **✨ Update**: All msdfgen binaries for supported platforms are now pre-bundled in the repo and distributed via npm, avoiding GitHub rate limits and download failures. No automatic download during installation. For manual updates, see [MSDFGEN_INSTALL.md](./docs/MSDFGEN_INSTALL.md).
+>
+> On macOS, the installer automatically handles security restrictions (removes quarantine attributes, applies code signatures). See [MACOS_SECURITY.md](./docs/MACOS_SECURITY.md) for details.
+>
+
+After installation, simply run `msdf-bmfont` in the console to generate font files. Type `msdf-bmfont --help` for usage details.
 
 ## Run script to see MSDF font in browser using pixi.js
 
