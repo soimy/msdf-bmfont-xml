@@ -8,7 +8,7 @@ const path = require('path');
 const ProgressBar = require('cli-progress');
 const fs = require('fs');
 const buffer = require('buffer').Buffer;
-const Jimp = require('jimp').Jimp;
+const sharp = require('sharp');
 const readline = require('readline');
 const assert = require('assert');
 
@@ -28,6 +28,16 @@ const defaultLogger = {
   warn: msg => console.warn(`\x1b[1;33m[Warn]\x1b[0m\x1b[33m ${msg}\x1b[0m`),
   error: msg => console.error(`\x1b[1;33m[Error]\x1b[0m\x1b[31m ${msg}\x1b[0m`)
 };
+
+// Helper function to convert hex color to RGBA object for Sharp
+function hexToRgba(hex) {
+  return {
+    r: (hex >>> 24) & 0xff,
+    g: (hex >>> 16) & 0xff,
+    b: (hex >>> 8) & 0xff,
+    alpha: (hex & 0xff) / 255
+  };
+}
 
 module.exports = generateBMFont;
 module.exports.defaultLogger = defaultLogger;
@@ -200,7 +210,14 @@ function generateBMFont (fontPath, opt, callback, customLog) {
       let svg = "";
       let texname = "";
       let fillColor = fieldType === "msdf" ? 0x000000ff : 0x00000000;
-      let img = new Jimp({width: bin.width, height: bin.height, color: fillColor});
+      let img = sharp({
+        create: {
+          width: bin.width,
+          height: bin.height,
+          channels: 4,
+          background: hexToRgba(fillColor)
+        }
+      });
       if (index > pages.length - 1) {
         if (packer.bins.length > 1) texname = `${filename}.${index}`;
         else texname = filename;
@@ -210,19 +227,46 @@ function generateBMFont (fontPath, opt, callback, customLog) {
         let imgPath = path.join(fontDir, `${texname}.png`);
         // let imgPath = `${texname}.png`;
         logger.log('Loading previous image : ', imgPath);
-        const loader = Jimp.read(imgPath);
-        loader.catch(err => {
+        try {
+          const prevImgBuffer = await sharp(imgPath).toBuffer();
+          img = img.composite([{input: prevImgBuffer, left: 0, top: 0}]);
+        } catch (err) {
           logger.warn("File read error: ", err);
-        });
-        const prevImg = await loader;
-        img.composite(prevImg, 0, 0);
+        }
       }
-      bin.rects.forEach(rect => {
-        if (rect.data.imageData) {
+      
+      // Process rects and build composite operations
+      const compositeOps = [];
+      for (const rect of bin.rects) {
+        if (rect.data.imageData && rect.data.imageWidth > 0 && rect.data.imageHeight > 0) {
+          let inputBuffer = rect.data.imageData;
+          
           if (rect.rot) {
-            rect.data.imageData.rotate(90);
+            // Create Sharp instance from raw buffer and rotate
+            inputBuffer = await sharp(rect.data.imageData, {
+              raw: {
+                width: rect.data.imageWidth,
+                height: rect.data.imageHeight,
+                channels: 4
+              }
+            }).rotate(90).toBuffer();
+          } else {
+            // Convert raw buffer to PNG buffer for compositing
+            inputBuffer = await sharp(rect.data.imageData, {
+              raw: {
+                width: rect.data.imageWidth,
+                height: rect.data.imageHeight,
+                channels: 4
+              }
+            }).png().toBuffer();
           }
-          img.composite(rect.data.imageData, rect.x, rect.y);
+          
+          compositeOps.push({
+            input: inputBuffer,
+            left: rect.x,
+            top: rect.y
+          });
+          
           if (debug) {
             const x_woffset = rect.x - rect.data.fontData.xoffset + (distanceRange >> 1);
             const y_woffset = rect.y - rect.data.fontData.yoffset + baseline + (distanceRange >> 1);
@@ -234,8 +278,14 @@ function generateBMFont (fontPath, opt, callback, customLog) {
         charData.y = rect.y;
         charData.page = index;
         chars.push(rect.data.fontData);
-      });
-      const buffer = await img.getBuffer("image/png");
+      }
+      
+      // Apply all composite operations
+      if (compositeOps.length > 0) {
+        img = img.composite(compositeOps);
+      }
+      
+      const buffer = await img.png().toBuffer();
       let tex = {
         filename: path.join(fontDir, texname),
         texture: buffer
@@ -384,11 +434,14 @@ function generateImage (opt, callback, logger) {
       height = 0;
     } else {
       const buffer = new Uint8ClampedArray(pixels);
-      imageData = new Jimp({data: buffer, width: width, height: height});
+      // Convert to Buffer for Sharp compatibility
+      imageData = Buffer.from(buffer);
     }
     const container = {
       data: {
         imageData,
+        imageWidth: width,
+        imageHeight: height,
         fontData: {
           id: char.charCodeAt(0),
           index: glyph.index,
