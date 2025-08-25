@@ -1,4 +1,3 @@
-const open = require('open');
 const handler = require('serve-handler');
 const http = require('http');
 const logger = require("../index").defaultLogger;
@@ -15,6 +14,7 @@ const server = http.createServer((request, response) => {
 const url = `http://localhost:9527/?f=${encodeURIComponent(fontFile)}&t=${encodeURIComponent(text)}`;
 
 (async () => {
+    const open = (await import('open')).default;
     server.listen(9527, () => {
         logger.log(`Test server running at ${url}`);
     });

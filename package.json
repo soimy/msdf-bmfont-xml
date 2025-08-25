@@ -4,6 +4,10 @@
   "description": "Creates a BMFont compatible bitmap font of Signed-Distance Fields from a font file",
   "main": "index.js",
   "scripts": {
+    "update-msdfgen": "node scripts/install-msdfgen.js",
+    "update-msdfgen-all": "node scripts/install-msdfgen.js --download-all",
+    "check-binary": "node scripts/check-binary.js status",
+    "clean-metadata": "node scripts/check-binary.js clean",
     "debug": "cd test/assets/fonts && node --inspect-brk=9229 ../../../cli.js -f json -o font -u -m 512,256 -t msdf -s 42 -r 5 -p 2 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
     "test": "npm run test:disk && npm run test:memory",
     "test:disk": "cd test/assets/fonts && node ../../../cli.js -f xml -o DIN_CB -v -u -m 512,256 -t msdf -s 42 -r 4 -p 2 --smart-size --pot ../../../assets/fonts/DIN_CB.ttf",
@@ -49,27 +53,27 @@
   "dependencies": {
     "arabic-persian-reshaper": "^1.0.1",
     "cli-progress": "^3.12.0",
-    "commander": "^2.20.3",
+    "commander": "^14.0.0",
     "handlebars": "^4.7.8",
     "is-invalid-path": "^1.0.2",
     "jimp": "^1.6.0",
-    "js2xmlparser": "^4.0.2",
+    "js2xmlparser": "^5.0.0",
     "map-limit": "0.0.1",
     "maxrects-packer": "^2.7.3",
-    "opentype.js": "^0.11.0",
-    "update-notifier": "^5.1.0"
+    "opentype.js": "^1.3.4",
+    "update-notifier": "^7.3.1"
   },
   "devDependencies": {
-    "cz-conventional-changelog": "^2.1.0",
+    "cz-conventional-changelog": "^3.3.0",
     "load-bmfont": "^1.4.2",
-    "open": "^6.4.0",
-    "rimraf": "^2.7.1",
+    "open": "^10.2.0",
+    "rimraf": "^6.0.1",
     "run-parallel": "^1.2.0",
     "serve-handler": "^6.1.6",
     "standard-version": "^9.5.0",
     "tslint": "^5.20.1",
-    "typescript": "^3.9.10",
-    "xml2js": "^0.4.23"
+    "typescript": "^5.9.2",
+    "xml2js": "^0.6.2"
   },
   "config": {
     "commitizen": {

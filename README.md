@@ -22,8 +22,18 @@ npm install & npm run render
 npm install msdf-bmfont-xml -g
 ```
 
-Then you just need to call `msdf-bmfont` from console to generate font file.
-Type in `msdf-bmfont --help` for more detail usage.
+**✨ Update**: All msdfgen binaries for supported platforms are now pre-bundled in the repo and distributed via npm. This avoids GitHub rate limits and download failures. No automatic download is performed during installation.
+
+Supported platforms:
+
+- macOS (Intel & Apple Silicon)
+- Linux (x64 & ARM64)
+- Windows (x64)
+
+On macOS, the installer still automatically handles security restrictions by removing quarantine attributes and applying code signatures (see `MACOS_SECURITY.md`).
+
+After installation, simply call `msdf-bmfont` from the console to generate font files.
+Type `msdf-bmfont --help` for more usage details.
 
 ![Console-Demo](https://raw.githubusercontent.com/soimy/msdf-bmfont-xml/master/assets/console-demo.gif)
 
