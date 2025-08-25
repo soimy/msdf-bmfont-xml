@@ -28,7 +28,7 @@ jobs:
           - platform: Windows
             runs-on: windows-latest
           - platform: macOS Intel
-            runs-on: macos-latest-large
+            runs-on: macos-13 # only 13 available for free intel mac on OSS project
           - platform: macOS ARM64
             runs-on: macos-latest
           - platform: Linux x64
