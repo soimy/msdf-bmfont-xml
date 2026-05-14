@@ -123,10 +123,8 @@ function generateBMFont (fontPath, opt, callback, customLog) {
   if (fieldType !== 'msdf' && fieldType !== 'sdf' && fieldType !== 'psdf') {
     throw new TypeError('fieldType must be one of msdf, sdf, or psdf');
   }
-
-  const font = typeof fontPath === 'string'
-    ? opentype.loadSync(fontPath)
-    : opentype.parse(utils.bufferToArrayBuffer(fontPath));
+  const fontBuffer = typeof fontPath === 'string' ? fs.readFileSync(fontPath) : fontPath;
+  const font = opentype.parse(utils.bufferToArrayBuffer(fontBuffer));
 
   if (font.outlinesFormat !== 'truetype' && font.outlinesFormat !== 'cff') {
     throw new TypeError('must specify a truetype font (ttf, otf, woff)');
