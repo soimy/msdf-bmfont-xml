@@ -192,7 +192,7 @@ function generateBMFont (fontPath, opt, callback, customLog) {
       cb(null, res);
     }, logger);
   }, async (err, results) => {
-    if (err) callback(err);
+    if (err) return callback(err);
     bar.stop();
 
     packer.addArray(results);
@@ -312,6 +312,27 @@ function generateBMFont (fontPath, opt, callback, customLog) {
   });
 }
 
+function emptyCharContainer (char, glyph, fontSize, font) {
+  const scale = fontSize / font.unitsPerEm;
+  return {
+    data: {
+      fontData: {
+        id: char.charCodeAt(0),
+        index: glyph.index,
+        char: String(char),
+        width: 0,
+        height: 0,
+        xoffset: 0,
+        yoffset: 0,
+        xadvance: glyph.advanceWidth * scale,
+        chnl: 15
+      }
+    },
+    width: 0,
+    height: 0
+  };
+}
+
 function generateImage (opt, callback, logger) {
   const {binaryPath, font, char, fontSize, fieldType, distanceRange, roundDecimal, debug, tolerance} = opt;
   const glyph = font.charToGlyph(char);
@@ -356,7 +377,20 @@ function generateImage (opt, callback, logger) {
   let command = `"${binaryPath}" ${fieldType} -format text -stdout -size ${width} ${height} -translate ${xOffset} ${yOffset} -pxrange ${distanceRange} -stdin`;
 
   let subproc = exec(command, (err, stdout, stderr) => {
-    if (err) return callback(err);
+    if (err) {
+      // Systemic failures should abort entire font generation:
+      // - Node.js system errors (ENOENT, EACCES, etc.)
+      // - Process killed by signal (SIGSEGV, SIGKILL, etc.)
+      // - Shell-level severe errors (exit code >= 127, e.g., command not found)
+      const systemicNodeErrors = ['ENOENT', 'EACCES', 'ENOTDIR', 'ENOEXEC'];
+      const isSystemic = systemicNodeErrors.includes(err.code) ||
+        err.signal ||
+        (typeof err.code === 'number' && err.code >= 127);
+      if (isSystemic) return callback(err);
+      // Character-specific failures (exit code 1, etc.) can be tolerated as empty glyphs
+      logger.warn(`Failed to generate character '${char}' (${char.charCodeAt(0)}): ${err.message}, adding to font as empty`);
+      return callback(null, emptyCharContainer(char, glyph, fontSize, font));
+    }
     const rawImageData = stdout.match(/([0-9a-fA-F]+)/g).map(str => parseInt(str, 16)); // split on every number, parse from hex
     const pixels = [];
     const channelCount = rawImageData.length / width / height;
